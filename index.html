@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mother &amp; Baby Guide</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #FFF7F2;
+    color: #4A3B38;
+    line-height: 1.5;
+    padding-bottom: 48px;
+  }
+  header {
+    background: linear-gradient(135deg, #FDE8DC 0%, #FBE3EE 100%);
+    padding: 28px 20px 20px;
+    text-align: center;
+    border-bottom: 1px solid #F5D9C8;
+  }
+  header h1 { font-size: 1.7rem; color: #B25E6A; font-weight: 700; }
+  header p { color: #8A6F68; margin-top: 4px; font-size: 0.95rem; }
+  .note { max-width: 780px; margin: 10px auto 0; font-size: 0.78rem; color: #A98F86; }
+  main { max-width: 780px; margin: 0 auto; padding: 20px; }
+  section { margin-top: 30px; }
+  section > h2 {
+    font-size: 1.2rem; color: #B25E6A; margin-bottom: 4px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  section > .sub { font-size: 0.88rem; color: #8A6F68; margin-bottom: 14px; }
+
+  .panel { background: #fff; border: 1px solid #F3E1D6; border-radius: 14px; padding: 16px; }
+  input[type=text], input[type=number], input[type=date], select {
+    border: 1px solid #EBD5C6; border-radius: 10px; padding: 9px 12px;
+    font-size: 0.9rem; color: #5C4640; background: #FFFDFB; font-family: inherit;
+  }
+  input:focus, select:focus { outline: 2px solid #F3C6D0; }
+  button.btn {
+    border: none; background: #E98A9B; color: #fff; padding: 9px 18px;
+    border-radius: 999px; font-size: 0.88rem; font-weight: 600; cursor: pointer;
+  }
+  button.btn:hover { background: #DF7488; }
+  button.ghost {
+    border: 1px solid #EBD5C6; background: #fff; color: #8A6F68; padding: 7px 14px;
+    border-radius: 999px; font-size: 0.8rem; font-weight: 600; cursor: pointer;
+  }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .tag { font-size: 0.68rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; display: inline-block; }
+  .tag.ours { background: #E98A9B; color: #fff; }
+  .tag.other { background: #EFE6DF; color: #8A6F68; }
+  .tag.demo { background: #DDEDE3; color: #4E7A5F; }
+  .tag.warn { background: #FBE9DC; color: #C08457; }
+
+  /* Profile */
+  .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 640px) { .profile-grid { grid-template-columns: 1fr; } }
+  .field label { display: block; font-size: 0.78rem; font-weight: 700; color: #8A6F68; margin-bottom: 4px; }
+  .field input, .field select { width: 100%; }
+  .tracker-form { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 8px; align-items: end; margin-top: 10px; }
+  @media (max-width: 640px) { .tracker-form { grid-template-columns: 1fr 1fr; } }
+  .tracker-form .field label { font-size: 0.7rem; }
+  table.log { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 0.85rem; }
+  table.log th { text-align: left; color: #8A6F68; font-size: 0.75rem; padding: 6px 8px; border-bottom: 2px solid #F3E1D6; }
+  table.log td { padding: 7px 8px; border-bottom: 1px solid #F8EDE4; color: #5C4640; }
+  .records { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+  .record { width: 130px; text-align: center; }
+  .record img { width: 130px; height: 100px; object-fit: cover; border-radius: 10px; border: 1px solid #F3E1D6; }
+  .record small { font-size: 0.68rem; color: #A98F86; display: block; margin-top: 3px; word-break: break-word; }
+
+  /* Timeline */
+  .stages { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+  .stage-card {
+    background: #FFFFFF; border: 2px solid #F3E1D6; border-radius: 14px;
+    padding: 14px; cursor: pointer; transition: all .18s ease; text-align: left;
+    font-family: inherit;
+  }
+  .stage-card:hover { border-color: #EEB9C4; transform: translateY(-2px); }
+  .stage-card.active { border-color: #E98A9B; background: #FDF0F3; box-shadow: 0 4px 12px rgba(233,138,155,.18); }
+  .stage-card .emoji { font-size: 1.5rem; }
+  .stage-card h3 { font-size: 1rem; color: #6B5049; margin: 6px 0 2px; }
+  .stage-card p { font-size: 0.8rem; color: #9A837B; }
+  .stage-card .weeks { display: inline-block; margin-top: 8px; font-size: 0.72rem; background: #FBE9DC; color: #C08457; padding: 2px 10px; border-radius: 999px; }
+  .stage-card.active .weeks { background: #F8D7DF; color: #B25E6A; }
+
+  /* Checklist */
+  .check-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 620px) { .check-columns { grid-template-columns: 1fr; } }
+  .check-box { background: #FFFFFF; border: 1px solid #F3E1D6; border-radius: 14px; padding: 16px; }
+  .check-box h3 { font-size: 1rem; color: #C08457; margin-bottom: 10px; }
+  .check-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 6px; border-radius: 8px; cursor: pointer; transition: background .15s; }
+  .check-item:hover { background: #FDF3EE; }
+  .check-item input { margin-top: 4px; accent-color: #E98A9B; width: 16px; height: 16px; cursor: pointer; }
+  .check-item span { font-size: 0.9rem; }
+  .check-item.done span { text-decoration: line-through; color: #B9A69E; }
+  .progress-line { font-size: 0.8rem; color: #B25E6A; margin: 0 0 12px; font-weight: 600; }
+
+  /* Cards / products */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)); gap: 12px; }
+  .card { background: #FFFFFF; border: 1px solid #F3E1D6; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 6px; }
+  .card.in-budget { border-color: #BFDCC9; }
+  .card .p-emoji { font-size: 1.6rem; background: #FDF0E7; border-radius: 10px; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; }
+  .card h4 { font-size: 0.92rem; color: #5C4640; }
+  .card p { font-size: 0.78rem; color: #9A837B; flex: 1; }
+  .price { font-size: 0.82rem; font-weight: 700; color: #C08457; }
+  .cat-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .cat-chip {
+    border: 1px solid #EBD5C6; background: #fff; color: #8A6F68; padding: 6px 14px;
+    border-radius: 999px; font-size: 0.8rem; font-weight: 600; cursor: pointer;
+  }
+  .cat-chip.active { background: #E98A9B; border-color: #E98A9B; color: #fff; }
+  .budget-box { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; background: #FDF0E7; border-radius: 14px; padding: 14px; margin-bottom: 14px; }
+  .budget-box .field { flex: 1; min-width: 160px; }
+
+  /* Cart */
+  .cart-panel { background: #FDF0F3; border: 1px solid #F3C6D0; border-radius: 14px; padding: 16px; margin-top: 14px; }
+  .cart-panel h3 { color: #B25E6A; font-size: 1rem; margin-bottom: 8px; }
+  .cart-item { display: flex; justify-content: space-between; gap: 10px; font-size: 0.88rem; padding: 6px 0; border-bottom: 1px dashed #F3C6D0; color: #5C4640; }
+  .cart-item button { background: none; border: none; color: #C77A8A; cursor: pointer; font-size: 0.8rem; text-decoration: underline; }
+  .cart-total { font-weight: 700; color: #B25E6A; margin-top: 10px; font-size: 0.95rem; }
+
+  /* Nearby */
+  .loc-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .place { border-left: 4px solid #E8B4C0; }
+  .place.med { border-left-color: #9FC3E8; }
+  .place.clinic { border-left-color: #B7D9B0; }
+  .place h4 { font-size: 0.95rem; color: #5C4640; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+  /* Community */
+  .seg { display: inline-flex; background: #F7E7DC; border-radius: 999px; padding: 4px; gap: 4px; margin-bottom: 14px; }
+  .seg button { border: none; background: transparent; padding: 8px 20px; border-radius: 999px; font-size: 0.88rem; cursor: pointer; color: #8A6F68; font-weight: 600; transition: all .15s; font-family: inherit; }
+  .seg button.active { background: #E98A9B; color: #fff; }
+  .tip-card, .article-card { background: #FFFFFF; border: 1px solid #F3E1D6; border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+  .tip-card .who { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .tip-card .avatar { width: 38px; height: 38px; border-radius: 50%; background: #F8D7DF; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+  .tip-card .who strong { font-size: 0.9rem; color: #5C4640; display: block; }
+  .tip-card .who small { color: #A98F86; font-size: 0.74rem; }
+  .tip-card p, .article-card p { font-size: 0.9rem; color: #6B5049; }
+  .article-card h4 { font-size: 0.98rem; color: #5C4640; margin-bottom: 4px; }
+  .article-card { border-left: 4px solid #7FB89A; }
+  footer { text-align: center; font-size: 0.75rem; color: #B9A69E; margin-top: 40px; }
+  .empty-hint { font-size: 0.85rem; color: #B9A69E; font-style: italic; padding: 8px 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌸 Mother &amp; Baby Guide</h1>
+  <p>A gentle companion for mums-to-be and new mums in Malaysia</p>
+  <p class="note">Demo app with sample content only. Product names, prices, places and articles are made-up examples. Your profile and notes are kept only in this browser (localStorage) — nothing is sent anywhere. Uploaded records stay on this device for this session only.</p>
+</header>
+
+<main>
+
+  <!-- MY PROFILE -->
+  <section id="profile">
+    <h2>💗 My Profile</h2>
+    <p class="sub">Personalise your checklist and keep a simple private log. Stored only in this browser.</p>
+    <div class="panel">
+      <div class="profile-grid">
+        <div class="field"><label>Your name / nickname</label><input type="text" id="pfName" placeholder="e.g. Jaclyn"></div>
+        <div class="field"><label>Current stage</label>
+          <select id="pfStage">
+            <option value="t1">First Trimester (Weeks 1–12)</option>
+            <option value="t2">Second Trimester (Weeks 13–27)</option>
+            <option value="t3">Third Trimester (Weeks 28–40)</option>
+            <option value="pp">Postpartum</option>
+          </select>
+        </div>
+        <div class="field"><label>Current week (optional)</label><input type="number" id="pfWeek" min="1" max="45" placeholder="e.g. 20"></div>
+        <div class="field"><label>Area (for Nearby Care below)</label><input type="text" id="pfArea" placeholder="e.g. Petaling Jaya"></div>
+      </div>
+      <div class="btn-row" style="margin-top:12px;">
+        <button class="btn" id="pfSave">Save profile</button>
+        <button class="ghost" id="pfClear">Clear everything</button>
+        <span id="pfMsg" style="font-size:.8rem;color:#7FA98C;"></span>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:14px;">
+      <h3 style="font-size:1rem;color:#C08457;">🩺 Health Tracker <span class="tag demo">demo — not medical advice</span></h3>
+      <p style="font-size:.82rem;color:#9A837B;margin-top:4px;">Log your readings from check-ups. Numbers are yours only and never interpreted by this demo — always confirm with your doctor or nurse.</p>
+      <div class="tracker-form">
+        <div class="field"><label>Date</label><input type="date" id="trDate"></div>
+        <div class="field"><label>Weight (kg)</label><input type="number" id="trWeight" step="0.1" placeholder="—"></div>
+        <div class="field"><label>Blood pressure</label><input type="text" id="trBP" placeholder="e.g. 110/70"></div>
+        <div class="field"><label>Blood glucose (mmol/L)</label><input type="number" id="trGlucose" step="0.1" placeholder="—"></div>
+        <button class="btn" id="trAdd">Add</button>
+      </div>
+      <div id="logWrap"></div>
+    </div>
+
+    <div class="panel" style="margin-top:14px;">
+      <h3 style="font-size:1rem;color:#C08457;">📁 My Check-up Records <span class="tag warn">this session only</span></h3>
+      <p style="font-size:.82rem;color:#9A837B;margin-top:4px;">Upload a photo or screenshot of your medical report from each follow-up visit. Images stay on this device for this session and are not uploaded anywhere.</p>
+      <div class="btn-row" style="margin-top:10px;">
+        <input type="file" id="recFile" accept="image/*" multiple style="font-size:.82rem;color:#8A6F68;">
+      </div>
+      <div class="records" id="records"></div>
+      <p class="empty-hint" id="recordsEmpty">No records added yet — your uploads will appear here.</p>
+    </div>
+  </section>
+
+  <!-- TIMELINE -->
+  <section id="timeline">
+    <h2>🤰 Your Journey Timeline</h2>
+    <p class="sub">Tap a stage below to see what matters right now.</p>
+    <div class="stages" id="stageList"></div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section id="checklist">
+    <h2>✅ Stage Checklist</h2>
+    <p class="sub" id="checkSub"></p>
+    <p class="progress-line" id="progressLine"></p>
+    <div class="check-columns">
+      <div class="check-box"><h3>For Mum 💗</h3><div id="mumList"></div></div>
+      <div class="check-box"><h3>For Baby 🍼</h3><div id="babyList"></div></div>
+    </div>
+  </section>
+
+  <!-- SHOPPING PLANNER -->
+  <section id="shopping">
+    <h2>🛒 Shopping Planner</h2>
+    <p class="sub">Browse by category, set your budget, and add items to your shopping list. All prices are clearly-marked sample prices, not real quotes.</p>
+
+    <div class="budget-box">
+      <div class="field"><label>My budget (RM)</label><input type="number" id="budgetInput" min="0" step="50" placeholder="e.g. 500"></div>
+      <button class="btn" id="budgetSet">Set budget</button>
+      <span id="budgetMsg" style="font-size:.85rem;color:#C08457;font-weight:600;"></span>
+    </div>
+
+    <div class="cat-row" id="catRow"></div>
+    <div class="cards" id="shopCards"></div>
+
+    <div class="cart-panel">
+      <h3>🧺 My Shopping List</h3>
+      <div id="cartItems"></div>
+      <div class="cart-total" id="cartTotal"></div>
+      <p style="font-size:.75rem;color:#A98F86;margin-top:6px;">This list is a personal reminder — no payment, no checkout. Compare real prices at stores yourself.</p>
+    </div>
+  </section>
+
+  <!-- NEARBY CARE -->
+  <section id="nearby">
+    <h2>📍 Nearby Care</h2>
+    <p class="sub">Find example confinement centres, hospitals and clinics near your area. These are sample listings to show how the feature works — always verify real places yourself.</p>
+    <div class="loc-row">
+      <input type="text" id="locInput" placeholder="Type your area, e.g. Petaling Jaya" style="flex:1;min-width:220px;">
+      <button class="btn" id="locBtn">Find nearby care</button>
+    </div>
+    <p class="empty-hint" id="locHint">Enter an area above (try: Petaling Jaya, Shah Alam, Kuala Lumpur, Penang, Johor Bahru) — sample results will appear here.</p>
+    <div id="locResults"></div>
+  </section>
+
+  <!-- COMMUNITY -->
+  <section id="community">
+    <h2>👩‍👩‍👧 Community Tips</h2>
+    <p class="sub">Gentle advice from mamas like you. All content is sample text.</p>
+    <div class="seg" role="tablist">
+      <button id="tabTips" class="active">💬 Mother Tips</button>
+      <button id="tabArticles">📖 Trusted Articles</button>
+    </div>
+    <div id="tipsFeed"></div>
+    <div id="articlesFeed" style="display:none;"></div>
+  </section>
+
+  <footer>Mother &amp; Baby Guide · Demo app · No data leaves this device 🌷</footer>
+
+</main>
+
+<script>
+/* ============ DATA ============ */
+const STAGES = [
+  {
+    id: 't1', emoji: '🌱', name: 'First Trimester', weeks: 'Weeks 1–12', desc: 'Gentle beginnings',
+    sub: 'Things to settle early — nutrients, appointments and rest.',
+    mum: ['Start folic acid & prenatal vitamins', 'Book first check-up at a nearby klinik or hospital', 'Eat small frequent meals for morning sickness', 'Rest whenever you feel tired'],
+    baby: ['Plan a simple birth budget (sample)', 'Check your company maternity benefits', 'Start a pregnancy journal'],
+    products: [
+      { e: '💊', n: 'MamaPure Prenatal Vitamins', d: 'Sample product: folic acid + iron + DHA in one softgel.', c: 'Vitamins & Supplements', p: 68 },
+      { e: '📖', n: 'MamaPure Pregnancy Journal', d: 'Sample product: weekly prompts in English & Bahasa Malaysia.', c: 'Mum Comfort', p: 35 },
+      { e: '🍵', n: 'CalmMum Ginger Tea', d: 'Sample product: mild ginger blend for queasy mornings.', c: 'Mum Comfort', p: 22 },
+      { e: '🧴', n: 'BumpSoother Belly Butter', d: 'Sample product: shea butter cream for itchy, stretching skin.', c: 'Stretch Mark Cream', p: 49 }
+    ]
+  },
+  {
+    id: 't2', emoji: '🌺', name: 'Second Trimester', weeks: 'Weeks 13–27', desc: 'The happy middle',
+    sub: 'Energy is back — a good time to prepare and shop.',
+    mum: ['Attend detailed anomaly scan around week 20', 'Choose a hospital & delivery plan', 'Start gentle pregnancy exercise or prenatal yoga', 'Moisturise your growing belly daily'],
+    baby: ['Start your hospital bag checklist', 'Browse cot, stroller & car seat options', 'Register for antenatal classes (community centres often run these)'],
+    products: [
+      { e: '🧴', n: 'BumpSoother Belly Butter', d: 'Sample product: shea butter cream for itchy, stretching skin.', c: 'Stretch Mark Cream', p: 49 },
+      { e: '🛏️', n: 'SnugNest Pregnancy Pillow', d: 'Sample product: U-shaped pillow for side sleeping.', c: 'Mum Comfort', p: 129 },
+      { e: '🧘', n: 'GentleMum Prenatal Yoga Guide', d: 'Sample product: 20-minute video sessions for home practice.', c: 'Mum Comfort', p: 45 },
+      { e: '🚗', n: 'SafeRide Infant Car Seat', d: 'Sample card: a common car seat brand example in Malaysia.', c: 'Baby Gear', p: 359 }
+    ]
+  },
+  {
+    id: 't3', emoji: '🐣', name: 'Third Trimester', weeks: 'Weeks 28–40', desc: 'Almost there',
+    sub: 'Final preparations — bag packed, plan ready, rest well.',
+    mum: ['Pack your hospital bag by week 34', 'Learn labour breathing techniques', 'Watch for swelling & attend weekly check-ups', 'Prepare confinement (pantang) arrangements if you plan one'],
+    baby: ['Wash baby clothes with mild detergent', 'Set up the cot & sleeping space safely', 'Stock newborn diapers (small packs first)', 'Install and check the car seat'],
+    products: [
+      { e: '🎒', n: 'ReadyMama Hospital Bag Set', d: 'Sample product: pre-packed bag with mum & baby essentials.', c: 'Hospital Bag', p: 189 },
+      { e: '🫧', n: 'PureBub Newborn Laundry Wash', d: 'Sample product: plant-based, fragrance-free detergent.', c: 'Bath & Skincare', p: 26 },
+      { e: '🧷', n: 'TinyStep Newborn Diapers', d: 'Sample card: a popular diaper brand example, 84-pcs pack.', c: 'Diapers & Wipes', p: 42 },
+      { e: '🤱', n: 'LatchEasy Nursing Pillow', d: 'Sample product: supportive pillow for feeding practice.', c: 'Breastfeeding', p: 89 }
+    ]
+  },
+  {
+    id: 'pp', emoji: '🌷', name: 'Postpartum', weeks: 'After birth', desc: 'Recovery & new routines',
+    sub: 'Care for yourself while getting to know your little one.',
+    mum: ['Rest as much as possible — accept help offered', 'Follow your pantang / confinement practices comfortably', 'Book your 6-week postnatal check-up', 'Talk to someone if you feel low — it is common and okay'],
+    baby: ['Learn baby cues: hunger, sleep, full nappy', 'Track feeding & dirty diapers in the first weeks', 'Attend baby check-ups & keep the immunisation book (buku imunisasi)', 'Practise safe sleep: on the back, clear cot'],
+    products: [
+      { e: '🩹', n: 'RecoverHer Postpartum Care Kit', d: 'Sample product: warming pack, herbal bath & comfort essentials.', c: 'Mum Comfort', p: 155 },
+      { e: '🥣', n: 'NourishMum Confinement Soup Pack', d: 'Sample product: easy local-style soups for recovery weeks.', c: 'Mum Comfort', p: 78 },
+      { e: '🌰', n: 'LactaBoost Almond Booster Drink', d: 'Sample product: almond-based galactagogue drink for milk supply.', c: 'Breastfeeding', p: 55 },
+      { e: '🧕', n: 'ComfyFlow Nursing Wear', d: 'Sample product: breastfeeding-friendly everyday tops.', c: 'Breastfeeding', p: 62 }
+    ]
+  }
+];
+
+const CATALOG = [
+  { e: '🧴', n: 'BumpSoother Belly Butter', d: 'Shea butter cream for itchy, stretching skin.', c: 'Stretch Mark Cream', p: 49, src: 'ours' },
+  { e: '🌿', n: 'BellyJoy Stretch Cream', d: 'Cocoa butter formula often stocked in local pharmacies.', c: 'Stretch Mark Cream', p: 39, src: 'other' },
+  { e: '💊', n: 'MamaPure Prenatal Vitamins', d: 'Folic acid + iron + DHA in one softgel.', c: 'Vitamins & Supplements', p: 68, src: 'ours' },
+  { e: '🥛', n: 'NutriMum Mama Milk', d: 'Pregnancy milk powder brand example.', c: 'Vitamins & Supplements', p: 58, src: 'other' },
+  { e: '🌰', n: 'LactaBoost Almond Booster Drink', d: 'Almond-based galactagogue drink for milk supply.', c: 'Breastfeeding', p: 55, src: 'ours' },
+  { e: '🍪', n: 'MamaBake Lactation Cookies', d: 'Oat & brewer\'s yeast cookies, sample competitor example.', c: 'Breastfeeding', p: 32, src: 'other' },
+  { e: '🤱', n: 'LatchEasy Nursing Pillow', d: 'Supportive pillow for feeding practice.', c: 'Breastfeeding', p: 89, src: 'ours' },
+  { e: '🧷', n: 'TinyStep Newborn Diapers', d: 'Popular diaper brand example, 84-pcs newborn pack.', c: 'Diapers & Wipes', p: 42, src: 'other' },
+  { e: '💧', n: 'PureBub Sensitive Wipes', d: 'Fragrance-free water wipes, sample product.', c: 'Diapers & Wipes', p: 18, src: 'ours' },
+  { e: '🛁', n: 'BathBub Newborn Set', d: 'Baby bath & skincare example set.', c: 'Bath & Skincare', p: 46, src: 'other' },
+  { e: '🫧', n: 'PureBub Newborn Laundry Wash', d: 'Plant-based, fragrance-free detergent.', c: 'Bath & Skincare', p: 26, src: 'ours' },
+  { e: '🎒', n: 'ReadyMama Hospital Bag Set', d: 'Pre-packed bag with mum & baby essentials.', c: 'Hospital Bag', p: 189, src: 'ours' },
+  { e: '🚗', n: 'SafeRide Infant Car Seat', d: 'Common car seat brand example in Malaysia.', c: 'Baby Gear', p: 359, src: 'other' },
+  { e: '🛏️', n: 'SnugNest Pregnancy Pillow', d: 'U-shaped pillow for side sleeping.', c: 'Mum Comfort', p: 129, src: 'ours' },
+  { e: '🩹', n: 'RecoverHer Postpartum Care Kit', d: 'Warming pack, herbal bath & comfort essentials.', c: 'Mum Comfort', p: 155, src: 'ours' }
+];
+
+const CATS = ['All', ...new Set(CATALOG.map(p => p.c))];
+
+const PLACES = {
+  'petaling jaya': [
+    { t: 'hospital', n: 'PJ General Hospital (sample)', d: 'Example listing: delivery & NICU services. Verify real hospitals yourself.' },
+    { t: 'confinement', n: 'Lotus Confinement Centre PJ (sample)', d: 'Example listing: 28-day pantang packages, single room.' },
+    { t: 'clinic', n: 'Klinik Kesihatan Section 6 (sample)', d: 'Example listing: government maternal & child health clinic.' }
+  ],
+  'shah alam': [
+    { t: 'hospital', n: 'Shah Alam Specialist Hospital (sample)', d: 'Example listing: obstetrics ward & parenting classes.' },
+    { t: 'confinement', n: 'Impian Postnatal Care (sample)', d: 'Example listing: confinement meals & urut services.' },
+    { t: 'clinic', n: 'Klinik Ibu & Anak Shah Alam (sample)', d: 'Example listing: immunisation & postnatal checks.' }
+  ],
+  'kuala lumpur': [
+    { t: 'hospital', n: 'KL Maternity Medical Centre (sample)', d: 'Example listing: water birth options, lactation consultants.' },
+    { t: 'confinement', n: 'Bunga Kangkung Confinement Home (sample)', d: 'Example listing: TCM-informed confinement care, KL branch.' },
+    { t: 'clinic', n: 'Klinik Bersalin Chow Kit (sample)', d: 'Example listing: walk-in antenatal check-ups.' }
+  ],
+  'penang': [
+    { t: 'hospital', n: 'Penang Mother & Child Hospital (sample)', d: 'Example listing: neonatal unit & breastfeeding support group.' },
+    { t: 'confinement', n: 'Nyonya Confinement Retreat (sample)', d: 'Example listing: traditional Penang-style pantang meals.' },
+    { t: 'clinic', n: 'Klinik Kesihatan Jelutong (sample)', d: 'Example listing: baby check-ups & vaccination.' }
+  ],
+  'johor bahru': [
+    { t: 'hospital', n: 'JB Women\'s Specialist Centre (sample)', d: 'Example listing: obstetrics & 4D scan services.' },
+    { t: 'confinement', n: 'Sri Pelangi Confinement Centre (sample)', d: 'Example listing: jamu & urut traditions, JB.' },
+    { t: 'clinic', n: 'Klinik Ibu Anak Tampoi (sample)', d: 'Example listing: antenatal & immunisation services.' }
+  ]
+};
+
+const TIPS = [
+  { e: '👩🏻', n: 'Nurul A. (sample tip)', t: 'Shah Alam · mum of 1', m: 'During pantang, I asked my husband to warm the barut and keep my water hot. Don\'t be shy to tell family what you need — rest matters more than a perfect pantang.' },
+  { e: '👩🏾', n: 'Priya S. (sample tip)', t: 'Kuala Lumpur · mum of 2', m: 'I kept a small basket of snacks and water bottle next to my nursing spot. Breastfeeding makes you SO thirsty — the basket saved me many 3am feeds.' },
+  { e: '👩🏻‍🦱', n: 'Mei Ling T. (sample tip)', t: 'Penang · mum of 1', m: 'Morning sickness tip: dry crackers by the bed and eat one before standing up. Plain and boring, but it honestly worked for me.' }
+];
+
+const ARTICLES = [
+  { e: '📖', n: 'Eating well in your first trimester', s: 'Example article · Mother & Baby Guide Editorial', m: 'A gentle overview of common first-trimester foods, what to limit, and simple local meal ideas. (Demo content — not medical advice.)' },
+  { e: '📖', n: 'Understanding pantang: traditions & comfort', s: 'Example article · Mother & Baby Guide Editorial', m: 'How Malaysian confinement traditions vary between families, and how to adapt them gently to modern life. (Demo content.)' },
+  { e: '📖', n: 'Safe sleep basics for newborns', s: 'Example article · Mother & Baby Guide Editorial', m: 'A plain-language summary of safe sleep habits every new parent can practise at home. (Demo content.)' }
+];
+
+/* ============ STORAGE (device-local) ============ */
+const store = JSON.parse(localStorage.getItem('mbgProfile') || 'null') || {
+  name: '', stage: 't1', week: '', area: '',
+  logs: [], cart: [], budget: null, checks: {}
+};
+function saveStore() { localStorage.setItem('mbgProfile', JSON.stringify(store)); }
+
+let current = STAGES.find(s => s.id === store.stage) || STAGES[0];
+if (!store.checks[current.id]) store.checks[current.id] = {};
+
+let sessionRecords = []; // uploaded images, session-only
+let activeCat = 'All';
+
+/* ============ PROFILE ============ */
+function renderProfile() {
+  document.getElementById('pfName').value = store.name;
+  document.getElementById('pfStage').value = store.stage;
+  document.getElementById('pfWeek').value = store.week;
+  document.getElementById('pfArea').value = store.area;
+  document.getElementById('budgetInput').value = store.budget ?? '';
+}
+document.getElementById('pfSave').addEventListener('click', () => {
+  store.name = document.getElementById('pfName').value.trim();
+  store.stage = document.getElementById('pfStage').value;
+  store.week = document.getElementById('pfWeek').value;
+  store.area = document.getElementById('pfArea').value.trim();
+  current = STAGES.find(s => s.id === store.stage) || current;
+  saveStore();
+  renderStages(); renderStage();
+  document.getElementById('pfMsg').textContent = 'Saved ✓ (kept only in this browser)';
+  setTimeout(() => document.getElementById('pfMsg').textContent = '', 2500);
+});
+document.getElementById('pfClear').addEventListener('click', () => {
+  if (!confirm('Clear your saved profile, logs and shopping list from this browser?')) return;
+  localStorage.removeItem('mbgProfile');
+  location.reload();
+});
+
+/* Health tracker */
+function renderLog() {
+  const wrap = document.getElementById('logWrap');
+  if (!store.logs.length) {
+    wrap.innerHTML = '<p class="empty-hint">No readings yet. Add your first one above — a date is enough, other fields are optional.</p>';
+    return;
+  }
+  wrap.innerHTML = `<table class="log"><thead><tr><th>Date</th><th>Weight</th><th>BP</th><th>Glucose</th></tr></thead><tbody>` +
+    store.logs.slice().reverse().map(l =>
+      `<tr><td>${l.date || '—'}</td><td>${l.weight ? l.weight + ' kg' : '—'}</td><td>${l.bp || '—'}</td><td>${l.glucose ? l.glucose + ' mmol/L' : '—'}</td></tr>`
+    ).join('') + '</tbody></table>';
+}
+document.getElementById('trAdd').addEventListener('click', () => {
+  const date = document.getElementById('trDate').value;
+  const w = document.getElementById('trWeight').value;
+  const bp = document.getElementById('trBP').value.trim();
+  const g = document.getElementById('trGlucose').value;
+  if (!date && !w && !bp && !g) return;
+  store.logs.push({ date, weight: w, bp, glucose: g });
+  saveStore(); renderLog();
+  document.getElementById('trDate').value = '';
+  document.getElementById('trWeight').value = '';
+  document.getElementById('trBP').value = '';
+  document.getElementById('trGlucose').value = '';
+});
+
+/* Records upload (session only) */
+document.getElementById('recFile').addEventListener('change', e => {
+  for (const f of e.target.files) {
+    const url = URL.createObjectURL(f);
+    sessionRecords.push({ url, name: f.name });
+  }
+  e.target.value = '';
+  renderRecords();
+});
+function renderRecords() {
+  const el = document.getElementById('records');
+  document.getElementById('recordsEmpty').style.display = sessionRecords.length ? 'none' : '';
+  el.innerHTML = sessionRecords.map(r =>
+    `<div class="record"><img src="${r.url}" alt="record"><small>${r.name}</small></div>`).join('');
+}
+
+/* ============ TIMELINE ============ */
+function renderStages() {
+  document.getElementById('stageList').innerHTML = STAGES.map(s => `
+    <button class="stage-card ${s.id === current.id ? 'active' : ''}" data-id="${s.id}">
+      <span class="emoji">${s.emoji}</span>
+      <h3>${s.name}</h3><p>${s.desc}</p>
+      <span class="weeks">${s.weeks}</span>
+    </button>`).join('');
+  document.querySelectorAll('.stage-card').forEach(btn =>
+    btn.addEventListener('click', () => {
+      current = STAGES.find(s => s.id === btn.dataset.id);
+      store.stage = current.id;
+      saveStore();
+      renderStages(); renderStage();
+      document.getElementById('checklist').scrollIntoView({ behavior: 'smooth' });
+    })
+  );
+}
+
+/* ============ CHECKLIST ============ */
+function renderStage() {
+  const prog = document.getElementById('progressLine');
+  const hello = store.name ? ` Hi ${store.name}!` : '';
+  document.getElementById('checkSub').textContent =
+    `${current.emoji} ${current.name} (${current.weeks}) — ${current.sub}${hello}`;
+
+  if (!store.checks[current.id]) store.checks[current.id] = {};
+  document.getElementById('mumList').innerHTML = current.mum.map((t, i) => row('mum', i, t)).join('');
+  document.getElementById('babyList').innerHTML = current.baby.map((t, i) => row('baby', i, t)).join('');
+  document.querySelectorAll('#mumList input, #babyList input').forEach(cb =>
+    cb.addEventListener('change', updateProgress));
+  updateProgress();
+}
+function row(group, i, text) {
+  const on = !!store.checks[current.id][group + i];
+  return `<label class="check-item ${on ? 'done' : ''}">
+    <input type="checkbox" data-i="${group + i}" ${on ? 'checked' : ''}>
+    <span>${text}</span></label>`;
+}
+function updateProgress() {
+  document.querySelectorAll('#mumList .check-item, #babyList .check-item').forEach(l => {
+    const key = l.querySelector('input').dataset.i;
+    const on = l.querySelector('input').checked;
+    store.checks[current.id][key] = on;
+    l.classList.toggle('done', on);
+  });
+  saveStore();
+  const total = current.mum.length + current.baby.length;
+  const done = Object.values(store.checks[current.id]).filter(Boolean).length;
+  document.getElementById('progressLine').textContent = `${done} of ${total} items ticked for this stage 🌟`;
+}
+
+/* ============ SHOPPING PLANNER ============ */
+function renderCats() {
+  document.getElementById('catRow').innerHTML = CATS.map(c =>
+    `<button class="cat-chip ${c === activeCat ? 'active' : ''}" data-c="${c}">${c}</button>`).join('');
+  document.querySelectorAll('.cat-chip').forEach(b =>
+    b.addEventListener('click', () => { activeCat = b.dataset.c; renderCats(); renderShop(); }));
+}
+function renderShop() {
+  const list = CATALOG.filter(p => activeCat === 'All' || p.c === activeCat);
+  const b = store.budget;
+  document.getElementById('shopCards').innerHTML = list.map(p => {
+    const inBudget = b != null && p.p <= b;
+    return `<div class="card ${inBudget ? 'in-budget' : ''}">
+      <span class="tag demo">Sample price</span>
+      <div class="p-emoji">${p.e}</div>
+      <h4>${p.n}</h4>
+      <p>${p.d}</p>
+      <div class="price">~RM${p.p} <small style="font-weight:400;color:#A98F86;">(made-up demo price)</small></div>
+      <div class="btn-row">
+        <span class="tag ${p.src === 'ours' ? 'ours' : 'other'}">${p.src === 'ours' ? 'Our product (sample)' : 'Competitor example'}</span>
+        <button class="ghost" data-add="${p.n}" data-price="${p.p}">+ Add</button>
+      </div>
+      ${b != null ? `<small style="font-size:.72rem;color:${inBudget ? '#4E7A5F' : '#C77A8A'};">${inBudget ? '✓ Within your budget' : '✗ Over your set budget'}</small>` : ''}
+    </div>`;
+  }).join('');
+  document.querySelectorAll('[data-add]').forEach(btn =>
+    btn.addEventListener('click', () => {
+      store.cart.push({ n: btn.dataset.add, p: Number(btn.dataset.price) });
+      saveStore(); renderCart();
+    }));
+}
+document.getElementById('budgetSet').addEventListener('click', () => {
+  const v = Number(document.getElementById('budgetInput').value);
+  store.budget = v > 0 ? v : null;
+  saveStore(); renderShop(); renderBudgetMsg(); renderCart();
+});
+function renderBudgetMsg() {
+  document.getElementById('budgetMsg').textContent =
+    store.budget ? `Budget set: RM${store.budget} — green-border cards fit inside it.` : 'No budget set yet.';
+}
+function renderCart() {
+  const el = document.getElementById('cartItems');
+  if (!store.cart.length) {
+    el.innerHTML = '<p class="empty-hint">Your list is empty — tap “+ Add” on any product card.</p>';
+    document.getElementById('cartTotal').textContent = '';
+    return;
+  }
+  el.innerHTML = store.cart.map((it, i) =>
+    `<div class="cart-item"><span>${it.n}</span><span>~RM${it.p} <button data-rm="${i}">remove</button></span></div>`).join('');
+  el.querySelectorAll('[data-rm]').forEach(b =>
+    b.addEventListener('click', () => { store.cart.splice(Number(b.dataset.rm), 1); saveStore(); renderCart(); }));
+  const total = store.cart.reduce((s, it) => s + it.p, 0);
+  document.getElementById('cartTotal').textContent =
+    `Estimated total: ~RM${total}` + (store.budget ? ` of your RM${store.budget} budget ${total <= store.budget ? '✓' : '— over budget ⚠'}` : '') + ' (sample prices only)';
+}
+
+/* ============ NEARBY CARE ============ */
+function findPlaces() {
+  const q = document.getElementById('locInput').value.trim().toLowerCase();
+  const results = document.getElementById('locResults');
+  const hint = document.getElementById('locHint');
+  if (!q) { hint.textContent = 'Type an area above first.'; results.innerHTML = ''; return; }
+  const key = Object.keys(PLACES).find(k => q.includes(k) || k.includes(q));
+  if (!key) {
+    hint.textContent = `No sample listings for “${q}”. Try: Petaling Jaya, Shah Alam, Kuala Lumpur, Penang, Johor Bahru.`;
+    results.innerHTML = '';
+    return;
+  }
+  hint.style.display = 'none';
+  const icons = { hospital: '🏥', confinement: '🛖', clinic: '💉' };
+  const label = { hospital: 'Hospital', confinement: 'Confinement Centre', clinic: 'Clinic' };
+  const cls = { hospital: 'med', confinement: '', clinic: 'clinic' };
+  results.innerHTML = `<p style="font-size:.8rem;color:#A98F86;margin-bottom:10px;">Sample listings for <strong>${key.replace(/\b\w/g, c => c.toUpperCase())}</strong> — demo only, always verify real places:</p>
+    <div class="cards">` + PLACES[key].map(p => `
+      <div class="card place ${cls[p.t]}">
+        <h4>${icons[p.t]} ${p.n}</h4>
+        <span class="tag demo">${label[p.t]} · sample listing</span>
+        <p>${p.d}</p>
+      </div>`).join('') + '</div>';
+}
+document.getElementById('locBtn').addEventListener('click', findPlaces);
+document.getElementById('locInput').addEventListener('keydown', e => { if (e.key === 'Enter') findPlaces(); });
+
+/* ============ COMMUNITY ============ */
+function renderCommunity(tab) {
+  document.getElementById('tabTips').classList.toggle('active', tab === 'tips');
+  document.getElementById('tabArticles').classList.toggle('active', tab !== 'tips');
+  document.getElementById('tipsFeed').style.display = tab === 'tips' ? '' : 'none';
+  document.getElementById('articlesFeed').style.display = tab === 'tips' ? 'none' : '';
+  document.getElementById('tipsFeed').innerHTML = TIPS.map(t => `
+    <div class="tip-card">
+      <div class="who"><span class="avatar">${t.e}</span>
+        <div><strong>${t.n}</strong><small>${t.t}</small></div></div>
+      <p>${t.m}</p></div>`).join('');
+  document.getElementById('articlesFeed').innerHTML = ARTICLES.map(a => `
+    <div class="article-card">
+      <h4>${a.e} ${a.n}</h4>
+      <p><em style="font-size:.75rem;color:#7FA98C;">${a.s}</em><br>${a.m}</p></div>`).join('');
+}
+document.getElementById('tabTips').addEventListener('click', () => renderCommunity('tips'));
+document.getElementById('tabArticles').addEventListener('click', () => renderCommunity('articles'));
+
+/* ============ INIT ============ */
+renderProfile();
+renderLog();
+renderRecords();
+renderStages();
+renderStage();
+renderCats();
+renderShop();
+renderBudgetMsg();
+renderCart();
+renderCommunity('tips');
+</script>
+</body>
+</html>
